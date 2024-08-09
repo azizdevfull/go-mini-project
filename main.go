@@ -1,8 +1,10 @@
 package main
+
 import (
 	"go-tutorial/controllers"
 	internal "go-tutorial/internal/database"
 	"go-tutorial/services"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +20,7 @@ func main() {
 	noteService.InitNoteService(db)
 
 	notesController := &controllers.NoteController{}
-	notesController.InitNoteControllerRouter(router, *noteService)
+	notesController.InitController(*noteService)
+	notesController.InitRoutes(router)
 	router.Run()
 }

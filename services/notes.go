@@ -26,6 +26,15 @@ func (n *NoteService) GetNoteService(status bool) ([]*internal.Note, error) {
 
 	return data, nil
 }
+func (n *NoteService) GetNoteByIdService(id int64) ([]*internal.Note, error) {
+	var data []*internal.Note
+
+	if err := n.db.Where("id = ?", id).First(&data).Error; err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
 
 func (n *NoteService) CreateNoteService(title string, status bool) (*internal.Note, error) {
 	data := &internal.Note{
