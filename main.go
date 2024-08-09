@@ -22,5 +22,9 @@ func main() {
 	notesController := &controllers.NoteController{}
 	notesController.InitController(*noteService)
 	notesController.InitRoutes(router)
+
+	authController := &controllers.AuthController{}
+	authController.InitRoutes(router)
+
 	router.Run()
 }
