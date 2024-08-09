@@ -5,3 +5,7 @@ type Note struct {
 	Title  string `json:"title"`
 	Status bool   `json:"status"`
 }
+
+func (Note) TableName() string {
+	return "notes"
+}
