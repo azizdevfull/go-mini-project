@@ -27,9 +27,14 @@ func (a *AuthService) Login(email *string, password *string) (*internal.User, er
 		return nil, errors.New("password cannot be empty")
 	}
 	var user internal.User
-	if err := a.db.Where("email = ?", email).Where("password = ?", password).First(&user).Error; err != nil {
+	if err := a.db.Where("email = ?", email).Where("password = ?", password).Find(&user).Error; err != nil {
 		return nil, err
 	}
+
+	if user.Email == "" {
+		return nil, errors.New("user not found")
+	}
+
 	return &user, nil
 }
 func (a *AuthService) Register(email *string, password *string) (*internal.User, error) {
