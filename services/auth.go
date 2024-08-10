@@ -18,6 +18,19 @@ func InitAuthService(db *gorm.DB) *AuthService {
 	}
 }
 
+func (a *AuthService) CheckUserExist(email *string) bool {
+	var user internal.User
+	if err := a.db.Where("email = ?", email).Find(&user).Error; err != nil {
+		return false
+	}
+
+	if user.Email != "" {
+		return true
+	}
+
+	return false
+}
+
 func (a *AuthService) Login(email *string, password *string) (*internal.User, error) {
 	if email == nil {
 		return nil, errors.New("email cannot be empty")
@@ -45,6 +58,11 @@ func (a *AuthService) Register(email *string, password *string) (*internal.User,
 	if password == nil {
 		return nil, errors.New("password cannot be empty")
 	}
+
+	if a.CheckUserExist(email) {
+		return nil, errors.New("user already exist")
+	}
+
 	var user internal.User
 	user.Email = *email
 	user.Password = *password
