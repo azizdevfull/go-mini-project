@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"go-tutorial/internal/utils"
 	"go-tutorial/services"
 
 	"github.com/gin-gonic/gin"
@@ -38,19 +39,27 @@ func (a *AuthController) Register() gin.HandlerFunc {
 		var registerBody RegisterBody
 		if err := c.BindJSON(&registerBody); err != nil {
 			c.JSON(422, gin.H{
-				"message": err.Error(),
+				"error": err.Error(),
 			})
 			return
 		}
 		user, err := a.authService.Register(&registerBody.Email, &registerBody.Password)
 		if err != nil {
 			c.JSON(422, gin.H{
-				"message": err.Error(),
+				"error": err.Error(),
+			})
+			return
+		}
+		token, err := utils.GenerateToken(user.Email, user.Id)
+		if err != nil {
+			c.JSON(422, gin.H{
+				"error": err.Error(),
 			})
 			return
 		}
 		c.JSON(200, gin.H{
-			"message": user,
+			"data":  user,
+			"token": token,
 		})
 		return
 	}
@@ -64,19 +73,19 @@ func (a *AuthController) Login() gin.HandlerFunc {
 		var registerBody RegisterBody
 		if err := c.BindJSON(&registerBody); err != nil {
 			c.JSON(422, gin.H{
-				"message": err.Error(),
+				"error": err.Error(),
 			})
 			return
 		}
 		user, err := a.authService.Login(&registerBody.Email, &registerBody.Password)
 		if err != nil {
 			c.JSON(422, gin.H{
-				"message": err.Error(),
+				"error": err.Error(),
 			})
 			return
 		}
 		c.JSON(200, gin.H{
-			"message": user,
+			"data": user,
 		})
 		return
 	}
