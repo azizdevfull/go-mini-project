@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	internal "go-tutorial/internal/model"
+	"go-tutorial/internal/utils"
 
 	"gorm.io/gorm"
 )
@@ -40,12 +41,14 @@ func (a *AuthService) Login(email *string, password *string) (*internal.User, er
 		return nil, errors.New("password cannot be empty")
 	}
 	var user internal.User
-	if err := a.db.Where("email = ?", email).Where("password = ?", password).Find(&user).Error; err != nil {
+	if err := a.db.Where("email = ?", email).Find(&user).Error; err != nil {
 		return nil, err
 	}
-
 	if user.Email == "" {
 		return nil, errors.New("user not found")
+	}
+	if utils.CheckPasswordHash(*password, user.Password) == false {
+		return nil, errors.New("password not match")
 	}
 
 	return &user, nil
@@ -62,10 +65,14 @@ func (a *AuthService) Register(email *string, password *string) (*internal.User,
 	if a.CheckUserExist(email) {
 		return nil, errors.New("user already exist")
 	}
+	hashedPassword, err := utils.HashPassword(*password)
+	if err != nil {
+		return nil, err
+	}
 
 	var user internal.User
 	user.Email = *email
-	user.Password = *password
+	user.Password = hashedPassword
 	if err := a.db.Create(&user).Error; err != nil {
 		return nil, err
 	}
