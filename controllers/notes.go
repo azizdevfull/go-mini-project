@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"go-tutorial/internal/middleware"
 	"go-tutorial/services"
 	"strconv"
 
@@ -17,6 +18,7 @@ func (n *NoteController) InitController(noteService services.NoteService) *NoteC
 }
 func (n *NoteController) InitRoutes(router *gin.Engine) {
 	notes := router.Group("/notes")
+	notes.Use(middleware.CheckMiddleware)
 	notes.GET("/", n.GetNotes())
 	notes.GET("/:id", n.GetNote())
 	notes.POST("/", n.CreateNotes())
